@@ -505,7 +505,7 @@ Conditions:
   CreateAWXMemcachedECRRepository: !Equals [!Ref 'AWXMemcachedECRRepositoryName', '']
   CreateSidecarECRRepository: !Equals [!Ref 'SidecarECRRepositoryName', '']
   CreateDummy: !And [!Not [!Equals [!Ref 'ECSClusterName', '']],
-        '']], !Not [!Equals [!Ref 'DatabaseEndpoint', '']], !Not [!Equals [!Ref 'AWXWebECRRepositoryName',
+        !Not [!Equals [!Ref 'DatabaseEndpoint', '']], !Not [!Equals [!Ref 'AWXWebECRRepositoryName',
         '']], !Not [!Equals [!Ref 'AWXTaskECRRepositoryName', '']], !Not [!Equals [
         !Ref 'AWXRabbitMQECRRepositoryName', '']], !Not [!Equals [AWXMemcachedECRRepository,
         '']]]
@@ -536,7 +536,7 @@ Resources:
       GroupDescription: AWX ECS cluster hosts
       VpcId: !Ref 'VPC'
       SecurityGroupIngress:
-        - SourceSecurityGroupId: !Ref 'ALBSecurityGroup'
+        - SourceSecurityGroupId: !Ref 'AWXSecurityGroup'
           IpProtocol: '-1'
   ECSAutoScalingGroup:
     Condition: CreateECSCluster
@@ -658,22 +658,15 @@ Resources:
       Path: /
       Roles:
         - !Ref 'ECSInstanceRole'
-  ALBSecurityGroup:
-    Condition: CreateALB
+  AWXSecurityGroup:
+    Condition: CreateECSClusterB
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: AWX ECS Application Load Balancer
+      GroupDescription: AWX ECS
       VpcId: !Ref 'VPC'
       SecurityGroupIngress:
         - CidrIp: !Ref 'RemoteAccessCIDR'
           IpProtocol: '-1'
-  ALB:
-    Condition: CreateALB
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    Properties:
-      Subnets: !Ref 'ALBSubnets'
-      SecurityGroups:
-        - !Ref 'ALBSecurityGroup'
   AWXTaskECRRepository:
     Condition: CreateAWXTaskECRRepository
     Type: AWS::ECR::Repository
@@ -841,9 +834,6 @@ Outputs:
   DBEndpoint:
     Description: Database endpoint
     Value: !If [CreateRDS, !GetAtt 'DBInstance.Endpoint.Address', !Ref 'DatabaseEndpoint']
-  ALBDNSName:
-    Description: ALB DNSName
-    Value: !GetAtt 'ALB.DNSName'
   ECSInstanceRoleARN:
     Description: ECS IAM Role
     Value: !GetAtt 'ECSInstanceRole.Arn'
