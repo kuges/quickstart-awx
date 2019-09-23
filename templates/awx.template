@@ -47,6 +47,7 @@ Parameters:
       - 5.0.0
       - 6.0.0
       - 6.1.0
+      - 7.0.0
   AWXGitHubRepo:
     Description: Which github should we use as the source for the build
     Type: String
@@ -58,7 +59,7 @@ Parameters:
     NoEcho: 'true'
   MasterUsername:
     Description: Master database Username. Only applicable if DatabaseEndpoint is
-      blank
+      blank. Can't be admin
     Type: String
   AWXAdminPassword:
     Description: Password for the AWX admin user. Required
@@ -71,9 +72,6 @@ Parameters:
     Default: admin
   DatabaseEndpoint:
     Description: Endpoint for postgres database
-    Type: String
-  ALBARN:
-    Description: Arn for ALB
     Type: String
   VPC:
     Description: VPCID
@@ -656,39 +654,3 @@ Resources:
               awslogs-group: !Ref ContainerLogGroup
               awslogs-region: !Sub ${AWS::Region}
               awslogs-stream-prefix: sidecar
-  TargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      VpcId: !Ref VPC
-      Port: 80
-      Protocol: HTTP
-      Matcher: 
-        HttpCode: 200-499
-      HealthCheckIntervalSeconds: 10
-      HealthCheckPath: /
-      HealthCheckProtocol: HTTP
-      HealthCheckTimeoutSeconds: 5
-      HealthyThresholdCount: 2
-  ListenerRule:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      ListenerArn: !Ref Listener
-      Priority: 1
-      Conditions:
-      - Field: path-pattern
-        Values:
-        - "/"
-      Actions:
-      - Type: forward
-        TargetGroupArn: 
-          Ref: TargetGroup
-  Listener:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    DependsOn: BuildContainers
-    Properties:
-      DefaultActions:
-      - Type: forward
-        TargetGroupArn: !Ref 'TargetGroup'
-      LoadBalancerArn: !Ref 'ALBARN'
-      Port: 80
-      Protocol: HTTP

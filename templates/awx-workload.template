@@ -8,9 +8,7 @@ Metadata:
         Parameters:
           - VPC
           - PublicSubnet1ID
-          - PublicSubnet2ID
           - PrivateSubnet1ID
-          - PrivateSubnet2ID
           - RemoteAccessCIDR
       - Label:
           default: Amazon EC2 Configuration
@@ -46,12 +44,8 @@ Metadata:
         default: The ID of your existing VPC
       PrivateSubnet1ID:
         default: Private subnet 1 in Availability Zone 1
-      PrivateSubnet2ID:
-        default: Private subnet 2 in Availability Zone 2
       PublicSubnet1ID:
         default: Public DMZ subnet 1 in Availability Zone 1
-      PublicSubnet2ID:
-        default: Public DMZ subnet 2 in Availability Zone 2
       RemoteAccessCIDR:
         default: Allowed Bastion External Access CIDR
       KeyPairName:
@@ -102,26 +96,21 @@ Parameters:
   PrivateSubnet1ID:
     Description: Private subnet 1 in Availability Zone 1.
     Type: AWS::EC2::Subnet::Id
-  PrivateSubnet2ID:
-    Description: Private subnet 2 in Availability Zone 2.
-    Type: AWS::EC2::Subnet::Id
   PublicSubnet1ID:
     Description: Public DMZ subnet 1 in Availability Zone 1.
-    Type: AWS::EC2::Subnet::Id
-  PublicSubnet2ID:
-    Description: Public DMZ subnet 2 in Availability Zone 2.
     Type: AWS::EC2::Subnet::Id
 
   # AWX Related Information
   AWXVersion:
     Description: Which version of AWX to use
     Type: String
-    Default: 6.1.0
+    Default: 7.0.0
     AllowedValues:
       - 4.0.0
       - 5.0.0
       - 6.0.0
       - 6.1.0
+      - 7.0.0
   AWXAdminPassword:
     Description: AWX Admin Password. Required
     Type: String
@@ -139,11 +128,11 @@ Parameters:
   ClusterSize:
     Description: How many ECS hosts do you want to initially deploy?
     Type: Number
-    Default: 2
+    Default: 1
   InstanceType:
     Description: Which instance type should we use to build the ECS cluster?
     Type: String
-    Default: m4.large
+    Default: t3a.medium
   KeyPairName:
     Description: Public/private key pairs allow you to securely connect to your instance after it launches
     Type: AWS::EC2::KeyPair::KeyName
@@ -175,6 +164,7 @@ Parameters:
       - db.r3.2xlarge
       - db.r3.4xlarge
       - db.r3.8xlarge
+      - db.t2.micro
       - db.t3.micro
       - db.t3.small
       - db.t3.medium
@@ -283,7 +273,7 @@ Parameters:
     Type: String
     NoEcho: 'true'
   MasterUsername:
-    Description: Master database Username.
+    Description: Master database Username. Can't be admin
     MinLength: 1
     MaxLength: 63 
     Type: String
@@ -330,8 +320,8 @@ Resources:
         InstanceType: !Ref 'InstanceType'
         ClusterSize: !Ref 'ClusterSize'
         VPC: !Ref 'VPC'
-        ECSSubnets: !Sub '${PrivateSubnet1ID},${PrivateSubnet2ID}'
-        ALBSubnets: !Sub '${PublicSubnet1ID},${PublicSubnet2ID}'
+        ECSSubnets: !Sub '${PrivateSubnet1ID}'
+        ALBSubnets: !Sub '${PublicSubnet1ID}'
         RemoteAccessCIDR: !Ref 'RemoteAccessCIDR'
         MasterUsername: !Ref 'MasterUsername'
         MasterUserPassword: !Ref 'MasterUserPassword'
@@ -363,7 +353,6 @@ Resources:
         MasterUserPassword: !Ref 'MasterUserPassword'
         AWXAdminUsername: !Ref 'AWXAdminUsername'
         AWXAdminPassword: !Ref 'AWXAdminPassword'
-        ALBARN: !GetAtt 'InfrastructureStack.Outputs.ALBARN'
         VPC: !Ref 'VPC'
 Outputs:
   ALBDNSName:
