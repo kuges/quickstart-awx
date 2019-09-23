@@ -330,7 +330,7 @@ Resources:
         PreferredMaintenanceWindowStartTime: !Ref 'PreferredMaintenanceWindowStartTime'
         PreferredMaintenanceWindowEndTime: !Ref 'PreferredMaintenanceWindowEndTime'
         RDSAccessCidr: !Ref 'RDSAccessCidr'
-        RDSSubnets: !Sub '${PrivateSubnet1ID},${PrivateSubnet2ID}'
+        RDSSubnets: !Sub '${PrivateSubnet1ID}'
         DBInstanceClass: !Ref DBInstanceClass
   AWXStack:
     Type: AWS::CloudFormation::Stack
