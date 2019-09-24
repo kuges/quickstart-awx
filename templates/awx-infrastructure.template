@@ -227,7 +227,7 @@ Parameters:
     Description: The default timezone for the database engine to use. Only applicable
       if DatabaseEndpoint is blank
     Type: String
-    Default: UTC
+    Default: Australia/Sydney
     AllowedValues:
       - Africa/Cairo
       - Africa/Casablanca
@@ -428,7 +428,7 @@ Parameters:
     Description: Indicates whether the DB instance is encrypted. Only applicable if
       DatabaseEndpoint is blank
     Type: String
-    Default: 'true'
+    Default: 'false'
     AllowedValues:
       - 'true'
       - 'false'
