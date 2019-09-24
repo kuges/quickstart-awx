@@ -659,7 +659,7 @@ Resources:
       Roles:
         - !Ref 'ECSInstanceRole'
   AWXSecurityGroup:
-    Condition: CreateECSClusterB
+    Condition: CreateECSCluster
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: AWX ECS

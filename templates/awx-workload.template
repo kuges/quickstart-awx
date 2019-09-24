@@ -9,6 +9,7 @@ Metadata:
           - VPC
           - PublicSubnet1ID
           - PrivateSubnet1ID
+          - PrivateSubnet2ID
           - RemoteAccessCIDR
       - Label:
           default: Amazon EC2 Configuration
@@ -44,6 +45,8 @@ Metadata:
         default: The ID of your existing VPC
       PrivateSubnet1ID:
         default: Private subnet 1 in Availability Zone 1
+      PrivateSubnet2ID:
+        default: Private subnet 2 in Availability Zone 2
       PublicSubnet1ID:
         default: Public DMZ subnet 1 in Availability Zone 1
       RemoteAccessCIDR:
@@ -95,6 +98,9 @@ Parameters:
     Type: String
   PrivateSubnet1ID:
     Description: Private subnet 1 in Availability Zone 1.
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet2ID:
+    Description: Private subnet 2 in Availability Zone 2.
     Type: AWS::EC2::Subnet::Id
   PublicSubnet1ID:
     Description: Public DMZ subnet 1 in Availability Zone 1.
@@ -320,8 +326,7 @@ Resources:
         InstanceType: !Ref 'InstanceType'
         ClusterSize: !Ref 'ClusterSize'
         VPC: !Ref 'VPC'
-        ECSSubnets: !Sub '${PrivateSubnet1ID}'
-        ALBSubnets: !Sub '${PublicSubnet1ID}'
+        ECSSubnets: !Sub '${PrivateSubnet1ID},${PrivateSubnet2ID}'
         RemoteAccessCIDR: !Ref 'RemoteAccessCIDR'
         MasterUsername: !Ref 'MasterUsername'
         MasterUserPassword: !Ref 'MasterUserPassword'
@@ -330,7 +335,7 @@ Resources:
         PreferredMaintenanceWindowStartTime: !Ref 'PreferredMaintenanceWindowStartTime'
         PreferredMaintenanceWindowEndTime: !Ref 'PreferredMaintenanceWindowEndTime'
         RDSAccessCidr: !Ref 'RDSAccessCidr'
-        RDSSubnets: !Sub '${PrivateSubnet1ID}'
+        RDSSubnets: !Sub '${PrivateSubnet1ID},${PrivateSubnet2ID}'
         DBInstanceClass: !Ref DBInstanceClass
   AWXStack:
     Type: AWS::CloudFormation::Stack
@@ -354,7 +359,3 @@ Resources:
         AWXAdminUsername: !Ref 'AWXAdminUsername'
         AWXAdminPassword: !Ref 'AWXAdminPassword'
         VPC: !Ref 'VPC'
-Outputs:
-  ALBDNSName:
-    Description: "Http Endpoint for AWX Cluster"
-    Value: !GetAtt 'InfrastructureStack.Outputs.ALBDNSName'
