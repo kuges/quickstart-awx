@@ -71,6 +71,15 @@ Parameters:
     Description: CIDR block to allow to connect to database. Only applicable if DatabaseEndpoint
       is blank
     Type: String
+  RDSStorageSize:
+    Description: Size of the RDS storage
+    Type: String
+    Default: '20'
+    AllowedValues:
+      - '40'
+      - '60'
+      - '80'
+      - '100'
   AllowMajorVersionUpgrade:
     Description: If you update the EngineVersion property to a version that's different
       from the DB instance's current major version, set this property to true. Only
@@ -664,9 +673,7 @@ Resources:
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Snapshot
     Properties:
-      AllocatedStorage: !If [100GB, '100', !If [300GB, '300', !If [600GB, '600', !If [
-              1000GB, '1000', !If [1500GB, '1500', !If [2000GB, '2000', !If [3000GB,
-                    '3000', !If [4000GB, '4000', '6000']]]]]]]]
+      AllocatedStorage: !Ref 'RDSStorageSize'
       AllowMajorVersionUpgrade: !Ref 'AllowMajorVersionUpgrade'
       AutoMinorVersionUpgrade: !Ref 'AutoMinorVersionUpgrade'
       BackupRetentionPeriod: !Ref 'BackupRetentionPeriod'
