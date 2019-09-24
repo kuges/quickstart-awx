@@ -67,6 +67,13 @@ Parameters:
     Description: SSH KeyPair name
     Type: String
     Default: ''
+  EC2PublicIP:
+    Description: Associate public IP to EC2 Auto Scaling Group
+    Type: String
+    Default: 'true'
+    AllowedValues:
+      - 'true'
+      - 'false'
   RDSAccessCidr:
     Description: CIDR block to allow to connect to database. Only applicable if DatabaseEndpoint
       is blank
@@ -553,6 +560,7 @@ Resources:
     Condition: CreateECSCluster
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
+      AssociatePublicIpAddress: !Ref 'EC2PublicIP'
       ImageId: !FindInMap [AWSAMIRegionMap, !Ref 'AWS::Region', ECSAMI]
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyPairName'
