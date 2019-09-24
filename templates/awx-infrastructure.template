@@ -703,7 +703,6 @@ Resources:
       Iops: !If [100GB, 1000, !If [300GB, 3000, !If [600GB, 6000, !If [1000GB,
               10000, !If [1500GB, 15000, !If [2000GB, 20000, !If [3000GB, 30000,
                     !If [4000GB, 40000, 60000]]]]]]]]
-      KmsKeyId: !GetAtt 'KMSKey.Arn'
       LicenseModel: postgresql-license
       MasterUsername: !Ref 'MasterUsername'
       MasterUserPassword: !Ref 'MasterUserPassword'
@@ -747,35 +746,6 @@ Resources:
         - !If [3az, !Select [2, !Ref 'RDSSubnets'], !Ref 'AWS::NoValue']
         - !If [4az, !Select [3, !Ref 'RDSSubnets'], !Ref 'AWS::NoValue']
         - !If [5az, !Select [4, !Ref 'RDSSubnets'], !Ref 'AWS::NoValue']
-  KMSKey:
-    Condition: CreateRDS
-    Type: AWS::KMS::Key
-    Properties:
-      Description: !Sub 'Application: AWX Database: ${DBName}'
-      Enabled: true
-      EnableKeyRotation: true
-      KeyPolicy:
-        Version: '2012-10-17'
-        Id: key-default-1
-        Statement:
-          - Sid: Allow administration of the key
-            Effect: Allow
-            Principal:
-              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
-            Action:
-              - kms:Create*
-              - kms:Describe*
-              - kms:Enable*
-              - kms:List*
-              - kms:Put*
-              - kms:Update*
-              - kms:Revoke*
-              - kms:Disable*
-              - kms:Get*
-              - kms:Delete*
-              - kms:ScheduleKeyDeletion
-              - kms:CancelKeyDeletion
-            Resource: '*'
   MonitoringRole:
     Condition: CreateRDS
     Type: AWS::IAM::Role
