@@ -477,16 +477,11 @@ Resources:
                 Resource: '*'
   AWXWebService:
     Type: AWS::ECS::Service
-    DependsOn: ListenerRule
     Properties:
       Cluster: !Ref Cluster
       Role: !Ref ECSServiceRole
       DesiredCount: 1
       TaskDefinition: !Ref AWXWebTaskDefinition
-      LoadBalancers:
-        - ContainerName: awxweb
-          ContainerPort: 8052
-          TargetGroupArn: !Ref TargetGroup 
   ContainerLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
