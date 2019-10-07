@@ -407,6 +407,8 @@ Resources:
             - - !Ref QSS3KeyPrefix
               - "scripts/lambda_codebuild.zip"
       Handler: !Sub "lambda_codebuild.lambda_handler"
+      Layers:
+        - arn:aws:lambda:ap-southeast-2:817496625479:layer:AWSLambda-Python-AWS-SDK:1
       Runtime: python2.7
       Timeout: 300
       Role: !GetAtt BuildContainersLambdaExecutionRole.Arn
@@ -469,17 +471,11 @@ Resources:
                 Action:
                   - ec2:AuthorizeSecurityGroupIngres
                   - ec2:Describe*
-                  - elasticloadbalancing:DeregisterInstancesFromLoadBalancer
-                  - elasticloadbalancing:DeregisterTargets
-                  - elasticloadbalancing:Describe*
-                  - elasticloadbalancing:RegisterInstancesWithLoadBalancer
-                  - elasticloadbalancing:RegisterTargets
                 Resource: '*'
   AWXWebService:
     Type: AWS::ECS::Service
     Properties:
       Cluster: !Ref Cluster
-      Role: !Ref ECSServiceRole
       DesiredCount: 1
       TaskDefinition: !Ref AWXWebTaskDefinition
   ContainerLogGroup:

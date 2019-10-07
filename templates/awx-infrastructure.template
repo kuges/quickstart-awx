@@ -530,7 +530,7 @@ Resources:
       GroupDescription: AWX ECS cluster hosts
       VpcId: !Ref 'VPC'
       SecurityGroupIngress:
-        - SourceSecurityGroupId: !Ref 'AWXSecurityGroup'
+        - CidrIp: !Ref 'RemoteAccessCIDR'
           IpProtocol: '-1'
   ECSAutoScalingGroup:
     Condition: CreateECSCluster
